@@ -103,3 +103,13 @@ if __name__ == "__main__":
     
     print(f"Clean tree accuracy on clean data: {clean_accuracy:.3f}")
     print(f"Noisy tree accuracy on noisy data: {noisy_accuracy:.3f}")
+    
+    # Visualize the trees
+    print(f"\n" + "="*60)
+    print("TREE VISUALIZATION")
+    print("="*60)
+    print("Displaying clean dataset tree visualization...")
+    tree.visualize_tree(figsize=(18, 12), save_path='clean_tree_visualization.png')
+    
+    print("\nDisplaying noisy dataset tree visualization...")
+    noisy_tree.visualize_tree(figsize=(18, 12), save_path='noisy_tree_visualization.png')
