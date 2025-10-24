@@ -2,6 +2,7 @@ import numpy as np
 from typing import Tuple
 from tree_node import TreeNode
 from decision_tree_builder import decision_tree_learning
+from evaluation import k_fold_cross_validation
 
 def load_datasets() -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -113,3 +114,31 @@ if __name__ == "__main__":
     
     print("\nDisplaying noisy dataset tree visualization...")
     noisy_tree.visualize_tree(figsize=(18, 12), save_path='noisy_tree_visualization.png')
+
+    print(f"\n" + "="*60)
+    print("10-FOLD CROSS-VALIDATION")
+    print("="*60)
+
+    for dataset_name, dataset in (("Clean", clean_dataset), ("Noisy", noisy_dataset)):
+        print(f"\nDataset: {dataset_name}")
+        cv_results = k_fold_cross_validation(dataset, k=10, random_seed=42)
+
+        print("Confusion matrix (rows=actual, cols=predicted):")
+        print(cv_results["confusion_matrix"])
+
+        print("Per-fold accuracies:")
+        print(" ".join(f"{acc:.3f}" for acc in cv_results["accuracy_per_fold"]))
+
+        print(f"Average accuracy: {cv_results['average_accuracy']:.3f}")
+
+        print("Per-class precision/recall/F1:")
+        for label, precision, recall, f1_score in zip(
+            cv_results["labels"],
+            cv_results["precision"],
+            cv_results["recall"],
+            cv_results["f1"],
+        ):
+            print(
+                f"Room {label}: Precision={precision:.3f}, "
+                f"Recall={recall:.3f}, F1={f1_score:.3f}"
+            )
