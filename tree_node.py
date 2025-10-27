@@ -66,14 +66,23 @@ class TreeNode:
             predictions[i] = self.predict(sample)
         return predictions
     
-    def visualize_tree(self, figsize: Tuple[int, int] = (16, 10), save_path: Optional[str] = None) -> None:
+    def visualize_tree(self, figsize: Tuple[int, int] = None, save_path: Optional[str] = None) -> None:
         """
         Visualize the decision tree using matplotlib with a beautiful layout.
         
         Args:
-            figsize: Size of the figure (width, height)
+            figsize: Size of the figure (width, height). If None, automatically calculated based on tree size.
             save_path: If provided, save the figure to this path
         """
+        # Automatically calculate figure size based on tree dimensions if not provided
+        if figsize is None:
+            max_depth = self.get_depth()
+            leaf_count = self.get_leaf_count()
+            # Width scales with number of leaves, height with depth
+            width = max(16, min(40, leaf_count * 2))
+            height = max(10, min(30, max_depth * 3))
+            figsize = (width, height)
+        
         fig, ax = plt.subplots(figsize=figsize)
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
@@ -151,7 +160,14 @@ class TreeNode:
             positions[node_id] = (x, y)
         else:
             # Internal node - position based on children
-            mid = (left + right) / 2
+            # Allocate space proportionally based on number of leaves in each subtree
+            left_leaves = self.left_child.get_leaf_count()
+            right_leaves = self.right_child.get_leaf_count()
+            total_leaves = left_leaves + right_leaves
+            
+            # Calculate split point based on leaf proportions
+            available_width = right - left
+            mid = left + (available_width * left_leaves / total_leaves)
             
             # Recursively position children
             left_id = self.left_child._assign_positions_recursive(
