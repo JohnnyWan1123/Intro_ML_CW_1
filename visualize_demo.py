@@ -35,11 +35,11 @@ if __name__ == "__main__":
     print("="*60)
     print("Note: Large tree may take a moment to render...")
     
-    # Show the tree visualization with larger canvas for the full tree
-    tree.visualize_tree(figsize=(30, 20), save_path='tree_visualization_demo.png')
+    # Save the tree visualization
+    tree.visualize_tree(save_path='tree_visualization.png', show=False)
     
     print("\n✓ Visualization complete!")
-    print("  - Image saved as: tree_visualization_demo.png")
+    print("  - Image saved as: tree_visualization.png")
     print("\nVisualization Features:")
     print("  • Blue boxes = Decision nodes (showing split conditions)")
     print("  • Green boxes = Leaf nodes (showing room predictions)")

@@ -26,17 +26,6 @@ class TreeNode:
     right_child: Optional['TreeNode'] = None
     depth: int = 0
     
-    def print_tree(self, indent: int = 0) -> None:
-        """Print the tree structure for visualization."""
-        if self.is_leaf:
-            print("  " * indent + f"Leaf: Room {self.label} (depth: {self.depth})")
-        else:
-            print("  " * indent + f"Split on WiFi AP{self.feature_index + 1} <= {self.threshold:.2f} (depth: {self.depth})")
-            print("  " * indent + "├─ Left (≤):")
-            self.left_child.print_tree(indent + 1)
-            print("  " * indent + "└─ Right (>):")
-            self.right_child.print_tree(indent + 1)
-    
     def get_depth(self) -> int:
         """Get the maximum depth of the tree."""
         if self.is_leaf:
@@ -66,22 +55,24 @@ class TreeNode:
             predictions[i] = self.predict(sample)
         return predictions
     
-    def visualize_tree(self, figsize: Tuple[int, int] = None, save_path: Optional[str] = None) -> None:
+    def visualize_tree(self, figsize: Optional[Tuple[int, int]] = None, save_path: Optional[str] = None, show: bool = True) -> None:
         """
         Visualize the decision tree using matplotlib with a beautiful layout.
         
         Args:
             figsize: Size of the figure (width, height). If None, automatically calculated based on tree size.
             save_path: If provided, save the figure to this path
+            show: If True, display the plot. If False, only save without displaying.
         """
         # Automatically calculate figure size based on tree dimensions if not provided
         if figsize is None:
             max_depth = self.get_depth()
             leaf_count = self.get_leaf_count()
             # Width scales with number of leaves, height with depth
-            width = max(16, min(40, leaf_count * 2))
-            height = max(10, min(30, max_depth * 3))
-            figsize = (width, height)
+            # Keep it smaller so nodes appear larger
+            width = max(16, min(35, leaf_count * 1.5))
+            height = max(12, min(25, max_depth * 2.5))
+            figsize = (int(width), int(height))
         
         fig, ax = plt.subplots(figsize=figsize)
         ax.set_xlim(0, 1)
@@ -116,7 +107,10 @@ class TreeNode:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"Tree visualization saved to: {save_path}")
         
-        plt.show()
+        if show:
+            plt.show()
+        else:
+            plt.close(fig)
     
     def _calculate_positions(self) -> Dict[int, Tuple[float, float]]:
         """
@@ -236,15 +230,15 @@ class TreeNode:
         
         if self.is_leaf:
             # Leaf node - green box with room number
-            bbox_props = dict(boxstyle='round,pad=0.5', facecolor='#90EE90', 
-                            edgecolor='#2E7D32', linewidth=2.5)
+            bbox_props = dict(boxstyle='round,pad=0.3', facecolor='#90EE90', 
+                            edgecolor='#2E7D32', linewidth=2.0)
             ax.text(x, y, f'Room {int(self.label)}', 
                    ha='center', va='center', fontsize=11, fontweight='bold',
                    bbox=bbox_props, zorder=3)
         else:
             # Decision node - blue box with split condition
-            bbox_props = dict(boxstyle='round,pad=0.5', facecolor='#87CEEB', 
-                            edgecolor='#1976D2', linewidth=2.5)
+            bbox_props = dict(boxstyle='round,pad=0.3', facecolor='#87CEEB', 
+                            edgecolor='#1976D2', linewidth=2.0)
             
             split_text = f'WiFi AP{self.feature_index + 1}\n≤ {self.threshold:.2f}'
             ax.text(x, y, split_text, 
